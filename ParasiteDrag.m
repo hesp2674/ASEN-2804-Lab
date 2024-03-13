@@ -67,7 +67,7 @@ Q_f = Design_Input.Q_f(n);
 Abase_f = Design_Input.Abase_f(n);
 v1_x_c= Airfoil.X_thick_v1(n);
 v1_t_c= Airfoil.Thick_v1(n);
-v1_sweep= Design_Input.Sweep_v1;(n)
+v1_sweep= Design_Input.Sweep_v1(n);
 v1_Swet= Design_Input.Swet_v1(n);
 v2_x_c= Airfoil.X_thick_v2(n);
 v2_t_c= Airfoil.Thick_v2(n);
@@ -156,12 +156,12 @@ Swet_w = Design_Input.Swet_w(n);
 
 
     %% Horizontal Tail #1 Contribution to CDo
-    if Design_Input.Swet_h1(n)~=0 % If this component exists:
-        Re_h1 = (Velocity *MAC_h1 )/Nu_air ;
+    if h1_wet ~= 0 % If this component exists:
+        Re_h1 = (Velocity *MAC_h1 )/Nu_air;
         Cf_h1 = 0.074/(Re_h1 ^.2); %Flat Plate Coef of Friction for Turbulent Flow
-        FF_h1(n)  = (1+(.6/h1_x_c )*h1_t_c +100*(h1_t_c )^4)*(1.35*(Mach ^.18))*(cos(h1_sweep ))^.28; %Horz Tail Form Factor
-        if FF_h1(n) <1
-            FF_h1(n) =1;
+        FF_h1(n) = (1+(.6./h1_x_c).*h1_t_c +100.*(h1_t_c).^4).*(1.35.*(Mach.^.18)).*(cos(h1_sweep)).^0.28; %Horz Tail Form Factor
+        if FF_h1(n) < 1
+            FF_h1(n) = 1;
         end
 
         CDo_h1(n)  = (Cf_h1 *FF_h1(n) *h1_Q *h1_wet )/Sref_w ; %Contribution of Horz Tail 1 to CDo
@@ -171,7 +171,7 @@ Swet_w = Design_Input.Swet_w(n);
     if Design_Input.Swet_h2 ~=0 % If this component exists:
         Re_h2 = (Velocity *MAC_h2 )/Nu_air ;
         Cf_h2 = 0.074/(Re_h2^.2); %Flat Plate Coef of Friction for Turbulent Flow
-        FF_h2(n)  = (1+(.6/h2_x_c)*h2_t_c+100*(h2_t_c)^4)*(1.35*(Mach ^.18))*(cos(h2_sweep))^.28; %Horz Tail Form Factor
+        FF_h2(n) = (1+(.6/h2_x_c)*h2_t_c+100*(h2_t_c)^4)*(1.35*(Mach ^.18))*(cos(h2_sweep))^.28; %Horz Tail Form Factor
         if FF_h2(n) <1
             FF_h2(n) =1;
         end
@@ -182,12 +182,12 @@ Swet_w = Design_Input.Swet_w(n);
     if Design_Input.Swet_v1 ~=0 % If this component exists:
         Re_v1 = (Velocity *MAC_v1 )/Nu_air ;
         Cf_v1 = 0.074/(Re_v1)^0.2; %Flat Plate Coef of Friction for Turbulent Flow
-        FF_v1(n)  = (1+(0.6/(v1_x_c ))*(v1_t_c )+100*(v1_t_c )^4)*(1.35*(Mach ^0.18)*cos(v1_sweep )^0.28); %Horz Tail Form Factor
-        if FF_v1(n) <1
-            FF_v1(n) =1;
+        FF_v1(n) = (1+(0.6/(v1_x_c))*(v1_t_c)+100*(v1_t_c).^4)*(1.35*(Mach.^0.18)*cos(v1_sweep).^0.28); %Horz Tail Form Factor
+        if FF_v1(n) < 1
+            FF_v1(n) = 1;
         end
 
-        CDo_v1(n)  = Cf_v1*FF_v1(n) *v1_Q*v1_Swet /Sref_w ; %Contribution of Vert Tail 1 to CDo 
+        CDo_v1(n) = Cf_v1*FF_v1(n)*v1_Q*v1_Swet/Sref_w ; %Contribution of Vert Tail 1 to CDo 
     end
 
     %% Vertical Tail #2 Contribution to CDo
@@ -212,8 +212,8 @@ Swet_w = Design_Input.Swet_w(n);
     end
     
     %% Leakage and Proturbance Contribution to CDo
-    PercentLeakage = .1; % Your choice depending on how bad you think your fabrication will be 
-    CDo_lp(n) = PercentLeakage*(CDo_f(n) +CDo_v2(n) +CDo_v1(n) +CDo_h2(n) +CDo_h1(n) +CDo_w(n) ); %Increase in parasite drag due to leakage and protuberance usually 3-15% of total CDo, but here just taking fuselage contribution
+    PercentLeakage = 0.1; % Your choice depending on how bad you think your fabrication will be 
+    CDo_lp(n) = PercentLeakage*(CDo_f(n) + CDo_v2(n) + CDo_v1(n) + CDo_h2(n) + CDo_h1(n) + CDo_w(n)); %Increase in parasite drag due to leakage and protuberance usually 3-15% of total CDo, but here just taking fuselage contribution
  
     %%Total Parasite Drag and Wetted Area
     Swet_tot(n)  = h1_wet + h2_wet  + Swet_w  + Swet_f + v1_wet + v2_wet ; %Total Wetted Area
