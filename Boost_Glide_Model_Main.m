@@ -12,19 +12,19 @@ clear; clc; close all;
 warning('OFF', 'MATLAB:table:ModifiedAndSavedVarnames')
 
 %% Import and Read Aircraft Design File
-Design_Input = readtable("Design Input File.xlsx",'Sheet','Input','ReadRowNames',true); %Read in Aircraft Geometry File
-Count = 9; % Change This
+Design_Input = readtable("Wing Size Trade Study.xlsx",'Sheet','Input','ReadRowNames',true); %Read in Aircraft Geometry File
+Count = 120; % Change This
 
 %height(Design_Input); %Number of different aircraft configurations in geometry file
 
 % Import Airfoil Data File
-Airfoil = readtable("Design Input File.xlsx",'Sheet','Airfoil_Data'); %Read in Airfoil Data
+Airfoil = readtable("Wing Size Trade Study.xlsx",'Sheet','Airfoil_Data'); %Read in Airfoil Data
 
 % Import Benchmark Aircraft Truth Data
-Benchmark = readtable("Design Input File.xlsx",'Sheet','Benchmark_Truth'); %Read in Benchmark "Truth" Data for model validation only
+Benchmark = readtable("Wing Size Trade Study.xlsx",'Sheet','Benchmark_Truth'); %Read in Benchmark "Truth" Data for model validation only
 
 % Import Material Properties Data
-Material_Data = readtable("Design Input File.xlsx",'Sheet','Materials'); %Read in prototyp material densities for weight model
+Material_Data = readtable("Wing Size Trade Study.xlsx",'Sheet','Materials'); %Read in prototyp material densities for weight model
 
 %% Caluations - Conditions and Sizing
 % US Standard Atmophere - uses provided MATLAB File Exchange function
@@ -287,12 +287,18 @@ cmap = colormap(parula(Count));
 set(0,'DefaultAxesColorOrder',cmap)
 set(gca(),'ColorOrder',cmap);
 
+
+heightBoost = zeros(n,1);
+distBoost = zeros(n,1);
 fields = fieldnames(stateStruct);
 for n = 1:Count
-    distBoost = vecnorm([stateStruct.(fields{n}).data(:, 4), stateStruct.(fields{n}).data(:, 5)], 2, 2);
-    plot(distBoost,...
+    [heightBoost(n), ~] = min(stateStruct.(fields{n}).data(:, 6));
+    heightBoost(n) = -heightBoost(n);
+    distBoostPlot = vecnorm([stateStruct.(fields{n}).data(:, 4), stateStruct.(fields{n}).data(:, 5)], 2, 2);
+    plot(distBoostPlot,...
             -stateStruct.(fields{n}).data(:, 6), ...
             DisplayName=Design_Input.Properties.RowNames{n}, Color=cmap(n, :))
+    [distBoost(n),~] = max(abs(distBoostPlot));
     if n == 1
         hold on
     end
